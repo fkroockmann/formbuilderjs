@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+    - "0.10.33"
+before_install:
+    - npm cache clean
+    - npm update npm -g
+    - npm install -g gulp
+install:
+    - npm install --save-dev
+script: gulp test
