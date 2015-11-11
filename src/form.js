@@ -11,8 +11,11 @@
 		this.config = config || {};
 		this.class = config.class || [];
 		this.method = config.method || 'POST';
+		this.errors = {};
+
 		this.listeners = {
 			'submit': [],
+			'validate': []
 		};
 
 		this.on = function (eventName, callback) {
@@ -22,12 +25,22 @@
 		};
 
 		this.dispatch = function (eventName, params) {
+
+			if (typeof arguments[0] !== 'string') {
+				throw 'Invalid event name';
+			}
+
 			var key,
-				listeners = form.listeners[eventName];
+				listeners = form.listeners[arguments[0]],
+				args = [];
+
+		    Array.prototype.push.apply(args, arguments);
+
+		    args.shift();
 
 			if (listeners) {
 				for (key in listeners) {
-					listeners[key](params);
+					listeners[key].apply(null, args);
 				}	
 			}
 		};
@@ -50,7 +63,40 @@
 				}
 			}
 
-			this.dispatch('submit', data);
+			form.dispatch('validate', data, form);
+
+			if (0 === Object.keys(form.errors).length) {
+				if (form.listeners.submit.length > 0) {
+					form.dispatch('submit', data);	
+				} else {
+					form.html.submit();
+				}
+			} else {
+				form.displayErrors();
+			}
+		};
+
+		this.displayErrors = function () {
+			var key,
+				errors = form.errors,
+				element;
+
+			for (key in errors) {
+				element = form.elements[key];
+
+				if (element !== undefined) {
+					element.error = errors[key];
+					element.displayError();
+				}
+			}	
+		};
+
+		this.addError = function(elementName, error) {
+			if (undefined === form.errors[elementName]) {
+				form.errors[elementName] = {};
+			}
+
+			form.errors[elementName] = error;
 		};
 
 		this.computeElements = function() {
@@ -108,6 +154,10 @@
 				}
 
 				element.html = wrap;
+
+				if (key !== 'submit') {
+					element.displayError();	
+				}
 
 				formElement.appendChild(wrap);
 			}

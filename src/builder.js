@@ -10,6 +10,8 @@
 
 		this.ElementMock = function (config) {
 			
+			var self = this;
+
 			this.id = 1;
 			this.name = config.name;
 			this.form = config.form;
@@ -19,6 +21,18 @@
 			this.disabled = config.disabled || false;
 			this.error = config.error || null;
 			this.type = config.type;
+			
+			this.displayError = function () {
+				if (null === self.error || undefined === self.error) {
+					return;
+				}
+
+				var span = document.createElement('span');
+				span.className = 'error';
+				span.innerHTML = self.error;
+
+				self.html.appendChild(span);
+			};
 
 			return this;
 		};
