@@ -138,7 +138,7 @@
 				element = form.elements[key];
 
 				wrap = document.createElement('div');
-				wrap.className= 'element_' + key;
+				wrap.className = 'element_' + key;
 
 				html = element.render(wrap);
 
@@ -163,7 +163,12 @@
 			}
 		};
 		
-		this.render = function () {
+		this.render = function (node) {
+
+			if (!node) {
+				throw 'An DOM node must be passed to render function arguments';
+			}
+
 			var formElement = document.createElement('form');
 
 			if (form.class.length > 0) {
@@ -177,7 +182,7 @@
 			
 			form.html = formElement;
 
-			return formElement;
+			return node.appendChild(formElement);
 		};
 		
 		this.init = function () {
