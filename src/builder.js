@@ -21,6 +21,9 @@
 			this.disabled = config.disabled || false;
 			this.error = config.error || null;
 			this.type = config.type;
+			this.wrapClass = config.wrap_class || '';
+			this.elementClass = config.element_class || '';
+			this.labelClass = config.label_class || '';
 			
 			this.displayError = function () {
 				if (null === self.error || undefined === self.error) {

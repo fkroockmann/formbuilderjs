@@ -25,12 +25,13 @@
 			self.checked = [];
 		}
 
-		self.render = function (div) {
+		self.render = function (wrap) {
 
 			var key,
 				option,
+				div,
 				checkbox,
-				span;
+				label;
 
 			if (self.options.length > 1) {
 				self.name = self.name + '[]';
@@ -38,8 +39,17 @@
 
 			for (key in self.options) {
 				option = self.options[key];
+				div = document.createElement('div');
 				checkbox = document.createElement('input');
-				span = document.createElement('span');
+				label = document.createElement('label');
+
+				if (config.sub_wrap_class) {
+					div.className = config.sub_wrap_class;
+				}
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
 
 				checkbox.type = 'checkbox';				
 				checkbox.name = self.name;
@@ -49,10 +59,11 @@
 					checkbox.checked = 'checked';
 				}
 
-				span.innerHTML = option;
+				label.appendChild(checkbox);
+				label.innerHTML = label.innerHTML + ' ' + option;
+				div.appendChild(label);
 
-				div.appendChild(checkbox);
-				div.appendChild(span);
+				wrap.appendChild(div);
 			}
 
 			return;

@@ -21,6 +21,9 @@
 			this.disabled = config.disabled || false;
 			this.error = config.error || null;
 			this.type = config.type;
+			this.wrapClass = config.wrap_class || '';
+			this.elementClass = config.element_class || '';
+			this.labelClass = config.label_class || '';
 			
 			this.displayError = function () {
 				if (null === self.error || undefined === self.error) {
@@ -90,7 +93,7 @@
 		this.id = 1;
 		this.name = config.name || 'form-' + this.id;
 		this.config = config || {};
-		this.class = config.class || [];
+		this.formClass = config.form_class || '';
 		this.method = config.method || 'POST';
 		this.errors = {};
 
@@ -198,7 +201,15 @@
 				}
 			}
 
-			form.elements.submit = new FormBuilder.elements.submit({'form': form});
+			form.elements.submit = 
+				new FormBuilder
+						.elements
+						.submit(
+							{
+								'form': form, 
+								'elementClass': config.submit_class
+							}
+						);
 		};
 		
 		this.trigger = function (eventName, params) {
@@ -219,16 +230,9 @@
 				element = form.elements[key];
 
 				wrap = document.createElement('div');
-				wrap.className = 'element_' + key;
+				wrap.className = 'element_' + key + ' ' + element.wrapClass;
 
 				html = element.render(wrap);
-
-				if (element.label !== undefined && element.label !== null) {
-					var label = document.createElement('label');
-
-					label.innerHTML = element.label;
-					wrap.appendChild(label);
-				}
 
 				if (undefined !== html) {
 					wrap.appendChild(html);
@@ -252,8 +256,8 @@
 
 			var formElement = document.createElement('form');
 
-			if (form.class.length > 0) {
-				formElement.className = form.class.join(' ');
+			if (form.formClass) {
+				formElement.className = form.formClass;
 			}
 
 			formElement.method = form.method;
@@ -310,12 +314,13 @@
 			self.checked = [];
 		}
 
-		self.render = function (div) {
+		self.render = function (wrap) {
 
 			var key,
 				option,
+				div,
 				checkbox,
-				span;
+				label;
 
 			if (self.options.length > 1) {
 				self.name = self.name + '[]';
@@ -323,8 +328,17 @@
 
 			for (key in self.options) {
 				option = self.options[key];
+				div = document.createElement('div');
 				checkbox = document.createElement('input');
-				span = document.createElement('span');
+				label = document.createElement('label');
+
+				if (config.sub_wrap_class) {
+					div.className = config.sub_wrap_class;
+				}
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
 
 				checkbox.type = 'checkbox';				
 				checkbox.name = self.name;
@@ -334,10 +348,11 @@
 					checkbox.checked = 'checked';
 				}
 
-				span.innerHTML = option;
+				label.appendChild(checkbox);
+				label.innerHTML = label.innerHTML + ' ' + option;
+				div.appendChild(label);
 
-				div.appendChild(checkbox);
-				div.appendChild(span);
+				wrap.appendChild(div);
 			}
 
 			return;
@@ -426,17 +441,27 @@
 			self.checked = [];
 		}
 
-		self.render = function (div) {
+		self.render = function (wrap) {
 
 			var key,
 				option,
+				div,
 				radio,
-				span;
+				label;
 
 			for (key in self.options) {
 				option = self.options[key];
+				div = document.createElement('div');
 				radio = document.createElement('input');
-				span = document.createElement('span');
+				label = document.createElement('label');
+
+				if (config.sub_wrap_class) {
+					div.className = config.sub_wrap_class;
+				}
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
 
 				radio.type = 'radio';				
 				radio.name = self.name;
@@ -446,10 +471,11 @@
 					radio.checked = 'checked';
 				}
 
-				span.innerHTML = option;
+				label.appendChild(radio);
+				label.innerHTML = label.innerHTML + ' ' + option;
+				div.appendChild(label);
 
-				div.appendChild(radio);
-				div.appendChild(span);
+				wrap.appendChild(div);
 			}
 
 			return;
@@ -496,16 +522,31 @@
 			self.selected = [];
 		}
 
-		self.render = function () {
+		self.render = function (wrap) {
 			var element = document.createElement('select'),
 				key;
 
 			element.name = self.name;
 			element.disabled = self.disabled;
 
+			if (self.label) {
+				var label = document.createElement('label');
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
+
+				label.innerHTML = self.label;
+				wrap.appendChild(label);
+			}
+
 			if (true === self.multiple) {
 				element.multiple = true;
 				element.name = element.name + '[]';
+			}
+
+			if (self.elementClass) {
+				element.className = self.elementClass;
 			}
 
 			for (key in self.options) {
@@ -559,12 +600,17 @@
 		var self = this;
 
 		this.form = config.form;
+		this.elementClass = config.elementClass;
 
 		this.render = function () {
 			var element = document.createElement('input');
 
 			element.type = "submit";
 			element.value = 'Submit';
+
+			if (self.elementClass) {
+				element.className = self.elementClass;
+			}
 
 			element.onclick = function () {
 				self.form.trigger('submit');
@@ -587,7 +633,7 @@
 
 		self = new FormBuilder.ElementMock(config);
 
-		self.render = function () {
+		self.render = function (wrap) {
 			var element = document.createElement('input');
 
 			element.type = 'text';
@@ -600,7 +646,22 @@
 
 			if (self.value !== undefined && self.value !== null) {
 				element.value = self.value;
-			}			
+			}	
+
+			if (self.elementClass) {
+				element.className = self.elementClass;
+			}
+
+			if (self.label) {
+				var label = document.createElement('label');
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
+
+				label.innerHTML = self.label;
+				wrap.appendChild(label);
+			}
 
 			return element;
 		};
@@ -623,7 +684,7 @@
 
 		self = new FormBuilder.ElementMock(config);
 
-		self.render = function () {
+		self.render = function (wrap) {
 			var element = document.createElement('textarea');
 
 			element.name = self.name;
@@ -635,9 +696,24 @@
 				element.placeholder	= self.placeholder;
 			}
 
+			if (self.label) {
+				var label = document.createElement('label');
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
+
+				label.innerHTML = self.label;
+				wrap.appendChild(label);
+			}
+
 			if (self.value !== undefined && self.value !== null) {
 				element.value = self.value;
-			}			
+			}		
+
+			if (self.elementClass) {
+				element.className = self.elementClass;
+			}	
 
 			return element;
 		};

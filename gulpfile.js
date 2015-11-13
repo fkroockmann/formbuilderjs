@@ -26,5 +26,5 @@ gulp.task('jshint', function() {
     .pipe(jshint.reporter('default'));
 });
 
-gulp.task('default', ['dist']);
 gulp.task('test', ['jshint']);
+gulp.task('default', ['test', 'dist']);

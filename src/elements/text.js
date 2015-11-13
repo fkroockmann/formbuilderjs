@@ -7,7 +7,7 @@
 
 		self = new FormBuilder.ElementMock(config);
 
-		self.render = function () {
+		self.render = function (wrap) {
 			var element = document.createElement('input');
 
 			element.type = 'text';
@@ -20,7 +20,22 @@
 
 			if (self.value !== undefined && self.value !== null) {
 				element.value = self.value;
-			}			
+			}	
+
+			if (self.elementClass) {
+				element.className = self.elementClass;
+			}
+
+			if (self.label) {
+				var label = document.createElement('label');
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
+
+				label.innerHTML = self.label;
+				wrap.appendChild(label);
+			}
 
 			return element;
 		};

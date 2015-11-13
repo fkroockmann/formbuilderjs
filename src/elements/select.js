@@ -17,16 +17,31 @@
 			self.selected = [];
 		}
 
-		self.render = function () {
+		self.render = function (wrap) {
 			var element = document.createElement('select'),
 				key;
 
 			element.name = self.name;
 			element.disabled = self.disabled;
 
+			if (self.label) {
+				var label = document.createElement('label');
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
+
+				label.innerHTML = self.label;
+				wrap.appendChild(label);
+			}
+
 			if (true === self.multiple) {
 				element.multiple = true;
 				element.name = element.name + '[]';
+			}
+
+			if (self.elementClass) {
+				element.className = self.elementClass;
 			}
 
 			for (key in self.options) {

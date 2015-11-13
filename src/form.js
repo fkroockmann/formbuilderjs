@@ -9,7 +9,7 @@
 		this.id = 1;
 		this.name = config.name || 'form-' + this.id;
 		this.config = config || {};
-		this.class = config.class || [];
+		this.formClass = config.form_class || '';
 		this.method = config.method || 'POST';
 		this.errors = {};
 
@@ -117,7 +117,15 @@
 				}
 			}
 
-			form.elements.submit = new FormBuilder.elements.submit({'form': form});
+			form.elements.submit = 
+				new FormBuilder
+						.elements
+						.submit(
+							{
+								'form': form, 
+								'elementClass': config.submit_class
+							}
+						);
 		};
 		
 		this.trigger = function (eventName, params) {
@@ -138,16 +146,9 @@
 				element = form.elements[key];
 
 				wrap = document.createElement('div');
-				wrap.className = 'element_' + key;
+				wrap.className = 'element_' + key + ' ' + element.wrapClass;
 
 				html = element.render(wrap);
-
-				if (element.label !== undefined && element.label !== null) {
-					var label = document.createElement('label');
-
-					label.innerHTML = element.label;
-					wrap.appendChild(label);
-				}
 
 				if (undefined !== html) {
 					wrap.appendChild(html);
@@ -171,8 +172,8 @@
 
 			var formElement = document.createElement('form');
 
-			if (form.class.length > 0) {
-				formElement.className = form.class.join(' ');
+			if (form.formClass) {
+				formElement.className = form.formClass;
 			}
 
 			formElement.method = form.method;

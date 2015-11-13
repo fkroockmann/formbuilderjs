@@ -23,17 +23,27 @@
 			self.checked = [];
 		}
 
-		self.render = function (div) {
+		self.render = function (wrap) {
 
 			var key,
 				option,
+				div,
 				radio,
-				span;
+				label;
 
 			for (key in self.options) {
 				option = self.options[key];
+				div = document.createElement('div');
 				radio = document.createElement('input');
-				span = document.createElement('span');
+				label = document.createElement('label');
+
+				if (config.sub_wrap_class) {
+					div.className = config.sub_wrap_class;
+				}
+
+				if (self.labelClass) {
+					label.className = self.labelClass;
+				}
 
 				radio.type = 'radio';				
 				radio.name = self.name;
@@ -43,10 +53,11 @@
 					radio.checked = 'checked';
 				}
 
-				span.innerHTML = option;
+				label.appendChild(radio);
+				label.innerHTML = label.innerHTML + ' ' + option;
+				div.appendChild(label);
 
-				div.appendChild(radio);
-				div.appendChild(span);
+				wrap.appendChild(div);
 			}
 
 			return;
