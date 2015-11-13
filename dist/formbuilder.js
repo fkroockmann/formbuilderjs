@@ -6,11 +6,12 @@
 		
 		var self = this;
 
+		this.defaultConfig = {};
 		this.elements = {};
 
 		this.ElementMock = function (config) {
 			
-			var self = this;
+			var element = this;
 
 			this.id = 1;
 			this.name = config.name;
@@ -21,21 +22,36 @@
 			this.disabled = config.disabled || false;
 			this.error = config.error || null;
 			this.type = config.type;
-			this.wrapClass = config.wrap_class || '';
-			this.elementClass = config.element_class || '';
-			this.labelClass = config.label_class || '';
-			
+
 			this.displayError = function () {
-				if (null === self.error || undefined === self.error) {
+				if (null === element.error || undefined === element.error) {
 					return;
 				}
 
 				var span = document.createElement('span');
 				span.className = 'error';
-				span.innerHTML = self.error;
+				span.innerHTML = element.error;
 
-				self.html.appendChild(span);
+				element.html.appendChild(span);
 			};
+
+			this.getDefaultElementClass = function (classParam) {
+				if (self.defaultConfig && 
+					self.defaultConfig.elements && 
+					self.defaultConfig.elements[config.type] &&
+					self.defaultConfig.elements[config.type][classParam]) {
+
+					return self.defaultConfig.elements[config.type][classParam];
+				}
+
+				return '';
+			};
+
+			this.setDefaultClass = function () {
+				element.wrapClass = config.wrap_class || element.getDefaultElementClass('wrap_class');
+				element.elementClass = config.element_class || element.getDefaultElementClass('element_class');
+				element.labelClass = config.label_class || element.getDefaultElementClass('label_class');
+			}();
 
 			return this;
 		};
@@ -70,12 +86,19 @@
 			self.Form = form;
 		};
 
+		this.setDefaultConfig  = function (config) {
+			if (config) {
+				self.defaultConfig = config;
+			}
+		};
+
 		return {
 			'getForm': this.getForm,
 			'register': this.register,
 			'ElementMock': this.ElementMock,
 			'setForm': this.setForm,
-			'elements': this.elements
+			'elements': this.elements,
+			'setDefaultConfig': this.setDefaultConfig
 		};
 	};
 
