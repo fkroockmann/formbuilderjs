@@ -66,11 +66,11 @@
 
 		this.configIsValid = function (config) {
 			if (undefined === config) {
-				throw 'config must be set';
+				throw 'Config must be set';
 			}
 
 			if (undefined === config.elements) {
-				throw 'elements must be set';
+				throw 'Elements must be set';
 			}
 
 			return true;
@@ -82,9 +82,19 @@
 			}
 		};
 
-		this.setForm = function (form) {
+		this.deRegister = function (name) {
+			if (undefined !== self.elements[name]) {
+				delete self.elements[name];
+			}
+		}
+
+		this.setFormClass = function (form) {
 			self.Form = form;
 		};
+
+		this.getFormClass = function () {
+			return self.Form;
+		}
 
 		this.setDefaultConfig  = function (config) {
 			if (config) {
@@ -92,13 +102,20 @@
 			}
 		};
 
+		this.getDefaultConfig = function () {
+			return self.defaultConfig;
+		};;
+
 		return {
 			'getForm': this.getForm,
 			'register': this.register,
+			'deRegister': this.deRegister,
 			'ElementMock': this.ElementMock,
-			'setForm': this.setForm,
+			'setFormClass': this.setFormClass,
+			'getFormClass': this.getFormClass,
 			'elements': this.elements,
-			'setDefaultConfig': this.setDefaultConfig
+			'setDefaultConfig': this.setDefaultConfig,
+			'getDefaultConfig': this.getDefaultConfig
 		};
 	};
 
@@ -307,7 +324,7 @@
 		};
 	};
 
-	FormBuilder.setForm(Form);
+	FormBuilder.setFormClass(Form);
 
 })();
 (function () {
