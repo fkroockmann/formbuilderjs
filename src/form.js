@@ -200,6 +200,6 @@
 		};
 	};
 
-	FormBuilder.setForm(Form);
+	FormBuilder.setFormClass(Form);
 
 })();

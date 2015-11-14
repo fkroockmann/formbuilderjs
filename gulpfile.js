@@ -1,10 +1,11 @@
-var gulp = require('gulp');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var jshint = require('gulp-jshint');
+var gulp = require('gulp'),
+    concat = require('gulp-concat'),
+    uglify = require('gulp-uglify'),
+    jshint = require('gulp-jshint'),
+    qunit = require('gulp-qunit');
 
 var paths = {
-  scripts: ['src/**/*.js'],
+  scripts: ['src/**/*.js', 'spec/**/*.js'],
 };
 
 gulp.task('dist', function() {
@@ -26,5 +27,10 @@ gulp.task('jshint', function() {
     .pipe(jshint.reporter('default'));
 });
 
-gulp.task('test', ['jshint']);
+gulp.task('qunit', function() {
+    return gulp.src('./spec/test-runner.html')
+        .pipe(qunit());
+});
+
+gulp.task('test', ['jshint', 'qunit']);
 gulp.task('default', ['test', 'dist']);
