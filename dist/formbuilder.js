@@ -11,9 +11,13 @@
 
 		this.ElementMock = function (config) {
 			
+			if (undefined === config) {
+				throw 'Config for element must be set';
+			}
+
 			var element = this;
 
-			this.id = 1;
+			this.id = '_' + Math.random().toString(36).substr(2, 6);
 			this.name = config.name;
 			this.form = config.form;
 			this.placeholder = config.placeholder;
@@ -51,6 +55,10 @@
 				element.wrapClass = config.wrap_class || element.getDefaultElementClass('wrap_class');
 				element.elementClass = config.element_class || element.getDefaultElementClass('element_class');
 				element.labelClass = config.label_class || element.getDefaultElementClass('label_class');
+			};
+
+			this.init = function () {
+				element.setDefaultClass();
 			}();
 
 			return this;
@@ -86,7 +94,7 @@
 			if (undefined !== self.elements[name]) {
 				delete self.elements[name];
 			}
-		}
+		};
 
 		this.setFormClass = function (form) {
 			self.Form = form;
@@ -94,7 +102,7 @@
 
 		this.getFormClass = function () {
 			return self.Form;
-		}
+		};
 
 		this.setDefaultConfig  = function (config) {
 			if (config) {
@@ -104,7 +112,7 @@
 
 		this.getDefaultConfig = function () {
 			return self.defaultConfig;
-		};;
+		};
 
 		return {
 			'getForm': this.getForm,

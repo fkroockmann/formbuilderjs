@@ -3,13 +3,9 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     jshint = require('gulp-jshint'),
     qunit = require('gulp-qunit');
-
-var paths = {
-  scripts: ['src/**/*.js', 'spec/**/*.js'],
-};
-
+    
 gulp.task('dist', function() {
-  return gulp.src(paths.scripts)
+  return gulp.src(['src/**/*.js'])
   	  .pipe(concat('formbuilder.js'))
   	  .pipe(gulp.dest('dist'))
       .pipe(concat('formbuilder.min.js'))
@@ -18,11 +14,11 @@ gulp.task('dist', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(paths.scripts, ['dist']);
+  gulp.watch(['src/**/*.js'], ['dist']);
 });
 
 gulp.task('jshint', function() {
-  return gulp.src(paths.scripts)
+  return gulp.src(['src/**/*.js', 'spec/**/*.js'])
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });
