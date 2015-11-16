@@ -199,7 +199,7 @@
 
 			if (0 === Object.keys(form.errors).length) {
 				if (form.listeners.submit.length > 0) {
-					form.dispatch('submit', data);	
+					form.dispatch('submit', data, form);	
 				} else {
 					form.html.submit();
 				}
@@ -335,6 +335,7 @@
 	FormBuilder.setFormClass(Form);
 
 })();
+
 (function () {
 
 	'use strict';
