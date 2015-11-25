@@ -31,7 +31,8 @@
 				option,
 				div,
 				checkbox,
-				label;
+				label,
+				inputs;
 
 			if (self.options.length > 1) {
 				self.name = self.name + '[]';
@@ -47,6 +48,10 @@
 					div.className = config.sub_wrap_class;
 				}
 
+				if (self.elementClass) {
+					checkbox.className = self.elementClass;
+				}
+
 				if (self.labelClass) {
 					label.className = self.labelClass;
 				}
@@ -55,15 +60,18 @@
 				checkbox.name = self.name;
 				checkbox.value = key;
 
-				if (-1 !== self.checked.indexOf(key)) {
-					checkbox.checked = 'checked';
-				}
-
 				label.appendChild(checkbox);
 				label.innerHTML = label.innerHTML + ' ' + option;
 				div.appendChild(label);
 
 				wrap.appendChild(div);
+			}
+
+			inputs = wrap.querySelectorAll('input[type=checkbox]');
+			for (var i = 0; i < inputs.length; i++) {
+				if (-1 !== self.checked.indexOf(inputs[i].value)) {
+					inputs[i].checked = true;
+				}
 			}
 
 			return;

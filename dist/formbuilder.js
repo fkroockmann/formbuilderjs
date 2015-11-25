@@ -136,13 +136,17 @@
 
 	var Form = function (elements, config) {
 
+		if (typeof elements !== 'object') {
+			throw 'Elements must be set in form constructor';
+		}
+
 		var form = this;
 
-		this.id = 1;
-		this.name = config.name || 'form-' + this.id;
+		this.id = 'form_' + Math.random().toString(36).substr(2, 5);
 		this.config = config || {};
-		this.formClass = config.form_class || '';
-		this.method = config.method || 'POST';
+		this.name = this.config.name || '';
+		this.formClass = this.config.form_class || '';
+		this.method = this.config.method || 'POST';
 		this.errors = {};
 
 		this.listeners = {
@@ -156,7 +160,7 @@
 			}
 		};
 
-		this.dispatch = function (eventName, params) {
+		this.dispatch = function () {
 
 			if (typeof arguments[0] !== 'string') {
 				throw 'Invalid event name';
@@ -201,7 +205,9 @@
 				if (form.listeners.submit.length > 0) {
 					form.dispatch('submit', data, form);	
 				} else {
-					form.html.submit();
+					if (form.html) {
+						form.html.submit();	
+					}
 				}
 			} else {
 				form.displayErrors();
@@ -255,17 +261,9 @@
 						.submit(
 							{
 								'form': form, 
-								'elementClass': config.submit_class
+								'elementClass': form.config.submit_class
 							}
 						);
-		};
-		
-		this.trigger = function (eventName, params) {
-			if (form.listeners[eventName]) {
-				if (typeof form[eventName] === 'function') {
-					form[eventName](params);
-				}
-			}
 		};
 		
 		this.renderElements = function (formElement) {
@@ -278,7 +276,8 @@
 				element = form.elements[key];
 
 				wrap = document.createElement('div');
-				wrap.className = 'element_' + key + ' ' + element.wrapClass;
+
+				wrap.className = 'element_' + key + (element.wrapClass ? ' ' + element.wrapClass : '');
 
 				html = element.render(wrap);
 
@@ -309,7 +308,11 @@
 			}
 
 			formElement.method = form.method;
-			formElement.id = 'form_' + form.id;
+			formElement.id = form.id;
+
+			if (form.name) {
+				formElement.name = form.name;	
+			}
 
 			form.renderElements(formElement);
 			
@@ -322,14 +325,7 @@
 			form.computeElements();
 		}();
 
-		return {
-			'id': this.id,
-			'name': this.name,
-			'elements': this.elements,
-			'method': this.method,
-			'render': this.render,
-			'on': this.on
-		};
+		return form;
 	};
 
 	FormBuilder.setFormClass(Form);
@@ -369,7 +365,8 @@
 				option,
 				div,
 				checkbox,
-				label;
+				label,
+				inputs;
 
 			if (self.options.length > 1) {
 				self.name = self.name + '[]';
@@ -385,6 +382,10 @@
 					div.className = config.sub_wrap_class;
 				}
 
+				if (self.elementClass) {
+					checkbox.className = self.elementClass;
+				}
+
 				if (self.labelClass) {
 					label.className = self.labelClass;
 				}
@@ -393,15 +394,18 @@
 				checkbox.name = self.name;
 				checkbox.value = key;
 
-				if (-1 !== self.checked.indexOf(key)) {
-					checkbox.checked = 'checked';
-				}
-
 				label.appendChild(checkbox);
 				label.innerHTML = label.innerHTML + ' ' + option;
 				div.appendChild(label);
 
 				wrap.appendChild(div);
+			}
+
+			inputs = wrap.querySelectorAll('input[type=checkbox]');
+			for (var i = 0; i < inputs.length; i++) {
+				if (-1 !== self.checked.indexOf(inputs[i].value)) {
+					inputs[i].checked = true;
+				}
 			}
 
 			return;
@@ -496,7 +500,8 @@
 				option,
 				div,
 				radio,
-				label;
+				label,
+				inputs;
 
 			for (key in self.options) {
 				option = self.options[key];
@@ -512,19 +517,26 @@
 					label.className = self.labelClass;
 				}
 
+				if (self.elementClass) {
+					radio.className = self.elementClass;
+				}
+
 				radio.type = 'radio';				
 				radio.name = self.name;
 				radio.value = key;
-
-				if (-1 !== self.checked.indexOf(key)) {
-					radio.checked = 'checked';
-				}
 
 				label.appendChild(radio);
 				label.innerHTML = label.innerHTML + ' ' + option;
 				div.appendChild(label);
 
 				wrap.appendChild(div);
+			}
+
+			inputs = wrap.querySelectorAll('input[type=radio]');
+			for (var i = 0; i < inputs.length; i++) {
+				if (-1 !== self.checked.indexOf(inputs[i].value)) {
+					inputs[i].checked = true;
+				}
 			}
 
 			return;
@@ -649,7 +661,7 @@
 		var self = this;
 
 		this.form = config.form;
-		this.elementClass = config.elementClass;
+		this.elementClass = config.elementClass || '';
 
 		this.render = function () {
 			var element = document.createElement('input');
@@ -662,7 +674,7 @@
 			}
 
 			element.onclick = function () {
-				self.form.trigger('submit');
+				self.form.submit();
 				
 				return false;
 			};

@@ -29,7 +29,8 @@
 				option,
 				div,
 				radio,
-				label;
+				label,
+				inputs;
 
 			for (key in self.options) {
 				option = self.options[key];
@@ -45,19 +46,26 @@
 					label.className = self.labelClass;
 				}
 
+				if (self.elementClass) {
+					radio.className = self.elementClass;
+				}
+
 				radio.type = 'radio';				
 				radio.name = self.name;
 				radio.value = key;
-
-				if (-1 !== self.checked.indexOf(key)) {
-					radio.checked = 'checked';
-				}
 
 				label.appendChild(radio);
 				label.innerHTML = label.innerHTML + ' ' + option;
 				div.appendChild(label);
 
 				wrap.appendChild(div);
+			}
+
+			inputs = wrap.querySelectorAll('input[type=radio]');
+			for (var i = 0; i < inputs.length; i++) {
+				if (-1 !== self.checked.indexOf(inputs[i].value)) {
+					inputs[i].checked = true;
+				}
 			}
 
 			return;

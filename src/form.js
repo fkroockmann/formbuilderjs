@@ -4,13 +4,17 @@
 
 	var Form = function (elements, config) {
 
+		if (typeof elements !== 'object') {
+			throw 'Elements must be set in form constructor';
+		}
+
 		var form = this;
 
-		this.id = 1;
-		this.name = config.name || 'form-' + this.id;
+		this.id = 'form_' + Math.random().toString(36).substr(2, 5);
 		this.config = config || {};
-		this.formClass = config.form_class || '';
-		this.method = config.method || 'POST';
+		this.name = this.config.name || '';
+		this.formClass = this.config.form_class || '';
+		this.method = this.config.method || 'POST';
 		this.errors = {};
 
 		this.listeners = {
@@ -24,7 +28,7 @@
 			}
 		};
 
-		this.dispatch = function (eventName, params) {
+		this.dispatch = function () {
 
 			if (typeof arguments[0] !== 'string') {
 				throw 'Invalid event name';
@@ -69,7 +73,9 @@
 				if (form.listeners.submit.length > 0) {
 					form.dispatch('submit', data, form);	
 				} else {
-					form.html.submit();
+					if (form.html) {
+						form.html.submit();	
+					}
 				}
 			} else {
 				form.displayErrors();
@@ -123,17 +129,9 @@
 						.submit(
 							{
 								'form': form, 
-								'elementClass': config.submit_class
+								'elementClass': form.config.submit_class
 							}
 						);
-		};
-		
-		this.trigger = function (eventName, params) {
-			if (form.listeners[eventName]) {
-				if (typeof form[eventName] === 'function') {
-					form[eventName](params);
-				}
-			}
 		};
 		
 		this.renderElements = function (formElement) {
@@ -146,7 +144,8 @@
 				element = form.elements[key];
 
 				wrap = document.createElement('div');
-				wrap.className = 'element_' + key + ' ' + element.wrapClass;
+
+				wrap.className = 'element_' + key + (element.wrapClass ? ' ' + element.wrapClass : '');
 
 				html = element.render(wrap);
 
@@ -177,7 +176,11 @@
 			}
 
 			formElement.method = form.method;
-			formElement.id = 'form_' + form.id;
+			formElement.id = form.id;
+
+			if (form.name) {
+				formElement.name = form.name;	
+			}
 
 			form.renderElements(formElement);
 			
@@ -190,14 +193,7 @@
 			form.computeElements();
 		}();
 
-		return {
-			'id': this.id,
-			'name': this.name,
-			'elements': this.elements,
-			'method': this.method,
-			'render': this.render,
-			'on': this.on
-		};
+		return form;
 	};
 
 	FormBuilder.setFormClass(Form);

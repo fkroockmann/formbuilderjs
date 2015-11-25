@@ -7,7 +7,7 @@
 		var self = this;
 
 		this.form = config.form;
-		this.elementClass = config.elementClass;
+		this.elementClass = config.elementClass || '';
 
 		this.render = function () {
 			var element = document.createElement('input');
@@ -20,7 +20,7 @@
 			}
 
 			element.onclick = function () {
-				self.form.trigger('submit');
+				self.form.submit();
 				
 				return false;
 			};
